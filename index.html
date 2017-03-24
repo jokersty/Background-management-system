@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8" />
+		<title>络漫后台管理系统</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<script src="js/common/userinfo.js"></script>
+
+		<!-- basic styles -->
+
+		<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="assets/css/font-awesome.min.css" />
+
+		<!--[if IE 7]>
+    <link rel="stylesheet" href="assets/css/font-awesome-ie7.min.css" />
+    <![endif]-->
+
+		<!-- page specific plugin styles -->
+
+		<link rel="stylesheet" href="assets/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="assets/css/datepicker.css" />
+		<link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
+
+		<!-- fonts -->
+
+		<link rel="stylesheet" href="assets\css\cyrillic.css" />
+
+		<!-- ace styles -->
+
+		<link rel="stylesheet" href="assets/css/ace.min.css" />
+		<link rel="stylesheet" href="assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="assets/css/ace-skins.min.css" />
+
+		<!--[if lte IE 8]>
+    <link rel="stylesheet" href="assets/css/ace-ie.min.css" />
+    <![endif]-->
+
+		<!-- inline styles related to this page -->
+
+		<!-- ace settings handler -->
+
+		<script src="assets/js/ace-extra.min.js"></script>
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+
+		<!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+	</head>
+	<style>
+		.ui-jqgrid tr.jqgrow td {
+		white-space: normal !important;
+		height:auto;
+		}
+		select{padding:0;}
+		#grid-pager{
+			position: relative;
+		}
+		.download1{
+			position: absolute;
+			left: 50px;
+			top: 14px;
+			font-size:14px;
+			cursor: pointer;
+			z-index: 999;
+		}
+	</style>
+	<body>
+		<div id="dialog-message" class="hide">
+			<div class="invoiceNo">发货单号:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="invoiceNoText"/></div>
+		</div>
+		<div class="navbar navbar-default" id="navbar">
+			<div class="navbar-container" id="navbar-container">
+				<div class="navbar-header pull-left">
+					<a href="#" class="navbar-brand">
+						<small>
+                    <i class="icon-leaf"></i>
+                    络漫后台管理系统
+                </small>
+					</a>
+				</div>
+
+				<div class="navbar-header pull-right" role="navigation">
+					<ul class="nav ace-nav">
+						<li class="light-blue">
+							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+								<img class="nav-user-photo" src="assets/avatars/user.jpg" alt="Jason's Photo" />
+								<span class="user-info">
+									<small>Welcome,</small>
+									<p id="username"></p>
+								</span>
+
+								<i class="icon-caret-down"></i>
+							</a>
+
+							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+
+								<li>
+									<a href="#" onclick="logout();">
+										<i class="icon-off"></i> 注销
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="main-container" id="main-container">
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+				<div class="sidebar" id="sidebar">
+					<ul class="nav nav-list">
+						<li class="active">
+							<a href="index.html">
+								<i class="icon-dashboard"></i>
+								<span class="menu-text"> 订单查询 </span>
+							</a>
+						</li>
+
+						<li>
+							<a href="calllog.html">
+								<i class="icon-text-width"></i>
+								<span class="menu-text"> 通话明细查询 </span>
+							</a>
+						</li>
+						
+						<li>
+							<a href="touchdev.html">
+								<i class="icon-desktop"></i>
+								<span class="menu-text"> 络漫宝设备 </span>
+							</a>
+						</li>
+						
+						<li>
+							<a href="datacard.html">
+								<i class="icon-list"></i>
+								<span class="menu-text"> 全球数据卡 </span>
+							</a>
+						</li>
+					</ul>
+
+					<div class="sidebar-collapse" id="sidebar-collapse">
+						<i class="icon-double-angle-left" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i>
+					</div>
+				</div>
+
+				<div class="main-content">
+					<div class="page-content">
+						<div class="page-header">
+							<h1>订单查询</h1>
+						</div>
+						<div class="row" style="height:40px;">
+							<div class="col-xs-12">
+								<div class="col-sm-2">
+									<label  style="padding:0; line-height: 28px; white-space: nowrap;" class="col-sm-5";>订单号：</label>
+									<input  type="text" id="orderId"  class="col-sm-7";/>
+								</div>
+								<div class="col-sm-3">
+									<label class="col-sm-5" style="padding:0; line-height: 28px; white-space: nowrap;">用户手机号：</label>
+									<input class="col-sm-7" type="text" id="phoneNumber" />
+								</div>
+								<div class="col-sm-2">
+									<label class="col-sm-5" style="padding:0; line-height: 28px; white-space: nowrap;">订单状态： </label>
+									<select class="col-sm-7" id="orderStatus" style="padding:0;">
+										<option value="">全部</option>
+										<option value="0">未确认</option>
+										<option value="1">已确认</option>
+										<option value="2">已取消</option>
+										<option value="3">退货中</option>
+										<option value="4">退款中</option>
+										<option value="5">关闭</option>
+									</select>
+								</div>
+								
+								<div class="col-sm-2">
+									<label class="col-sm-5" style="padding:0; line-height: 28px; white-space: nowrap;">支付状态： </label>
+									<select class="col-sm-7" id="payStatus">
+										<option value="">全部</option>
+										<option value="0">未付款</option>
+										<option value="1">付款中</option>
+										<option value="2">已付款</option>
+										<option value="3">已退款</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<label class="col-sm-5" style="padding:0; line-height: 28px; white-space: nowrap;">发货状态： </label>
+									<select class="col-sm-7" id="shippingStatus">
+										<option value="">全部</option>
+										<option value="0">未发货</option>
+										<option value="1">已发货</option>
+										<option value="2">已收货</option>
+										<option value="3">备货中</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row" style="height:40px;">
+							<div class="col-xs-12">
+								<div class="col-sm-2">
+									<label class="col-sm-5" style="padding:0; line-height: 28px; white-space: nowrap;">支付方式 ：</label>
+									<select class="col-sm-7" id="payId" style="padding:0;">
+										<option value="">全部</option>
+										<option value="1">余额支付</option>
+										<option value="2">支付宝</option>
+										<option value="3">财付通</option>
+										<option value="4">手机支付宝</option>
+										<option value="5">微信支付</option>
+										<option value="6">信程支付</option>
+									</select>
+								</div>
+								
+								<div class="col-sm-5">
+									<span class="col-sm-3" style="padding:0; line-height: 28px; white-space: nowrap;">订单生成：</span>
+									<p class="datep col-sm-4" style="float: left; padding:0;"><input class="datainp startTime" id="datebut" type="text" placeholder="开始时间" style="width:150px;" readonly  onClick="jeDate({dateCell:'#datebut',isTime:true,format:'YYYY-MM-DD hh:mm:ss', isinitVal:true})">
+									</p>
+									<p class="datep col-sm-4" style="float: left; padding:0;"><input class="datainp endTime" id="datebut2" type="text" placeholder="结束时间" style="width:150px;" readonly onClick="jeDate({dateCell:'#datebut2',isTime:true,format:'YYYY-MM-DD hh:mm:ss', isinitVal:true})">
+									</p>
+								</div>
+								<div class="col-sm-2">
+									<input placeholder="国家" style="width:130px; height:28px;" id="areaname"/>
+								</div>
+								<div class="col-sm-2">
+									<input placeholder="订单来源" style="width:130px; height:28px;" id="source"/>
+								</div>
+								<div class="col-sm-1">
+									<button style="width:60px;" id="saixuan">
+										<i class="icon-search icon-on-right bigger-110"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						
+
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+
+								<!--<div class="alert alert-info">
+                            <i class="icon-hand-right"></i>
+
+                            Please note that demo server is not configured to save the changes, therefore you may get an error message.
+                            <button class="close" data-dismiss="alert">
+                                <i class="icon-remove"></i>
+                            </button>
+                        </div>-->
+
+								<table id="grid-table"></table>
+
+								<div id="grid-pager">
+									<input type="button" value="下载" class="download1"/>
+								</div>
+
+								<script type="text/javascript">
+									var $path_base = "/"; //this will be used in gritter alerts containing images
+								</script>
+
+								<!-- PAGE CONTENT ENDS -->
+							</div>
+							<!-- /.col -->
+						</div>
+
+					</div>
+					<!-- /.page-content -->
+				</div>
+				<!-- /.main-content -->
+			</div>
+			<!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div>
+		<!-- /.main-container -->
+
+		<!-- basic scripts -->
+		<!--[if !IE]> -->
+		<script src="assets\js\jquery-2.0.3.min.js"></script>
+
+		<!-- <![endif]-->
+
+		<!--[if IE]>
+<script src="assets\js\jquery-1.10.2.min.js"></script>
+<![endif]-->
+
+		<!--[if !IE]> -->
+
+		<script type="text/javascript">
+			window.jQuery || document.write("<script src='assets/js/jquery-2.0.3.min.js'>" + "<" + "/script>");
+		</script>
+
+		<!-- <![endif]-->
+
+		<!--[if IE]>
+<script type="text/javascript">
+    window.jQuery || document.write("<script src='assets/js/jquery-1.10.2.min.js'>"+"<"+"/script>");
+</script>
+<![endif]-->
+
+		<script type="text/javascript">
+			if("ontouchend" in document) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+		</script>
+		<script src="assets/js/bootstrap.min.js"></script>
+		<script src="assets/js/typeahead-bs2.min.js"></script>
+
+		<!-- page specific plugin scripts -->
+		<script src="assets/js/date-time/bootstrap-datepicker.min.js"></script>
+		<script src="assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+		<script src="assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+		<!-- ace scripts -->
+		<script src="assets/js/jquery-ui-1.10.3.full.min.js"></script>
+		<script src="assets/js/jquery.ui.touch-punch.min.js"></script>
+
+		<script src="assets/js/ace-elements.min.js"></script>
+		<script src="assets/js/ace.min.js"></script>
+
+		<!-- inline scripts related to this page -->
+		<script src="js/common/omservices.js"></script>
+		<script type="text/javascript" src="jedate/jedate.js"></script>
+		<script>	
+			var editingFormId;
+			
+			$.widget("ui.dialog", $.extend({}, $.ui.dialog.prototype, {
+				_title: function(title) {
+					var $title = this.options.title || '&nbsp;'
+					if( ("title_html" in this.options) && this.options.title_html == true )
+						title.html($title);
+					else title.text($title);
+				}
+			}));
+			function editRowData(id, orderId,i) {
+			
+				var dialog = $( "#dialog-message" ).removeClass('hide').dialog({
+					modal: true,
+					title: "<div class='widget-header widget-header-small'><h4 class='smaller'>发货</h4></div>",
+					title_html: true,
+					buttons: [ 
+						{
+							text: "取消",
+							"class" : "btn btn-xs",
+							click: function() {
+								$( this ).dialog( "close" ); 
+							} 
+						},
+						{
+							text: "提交",
+							"class" : "btn btn-primary btn-xs",
+							click: function() {
+								var postdata={};
+								postdata.invoice_no=$('#invoiceNoText').val();
+								var id = window.editingRowData.id;
+								var orderId = window.editingRowData.orderId;
+								postdata.id=id;
+								postdata.orderid=orderId;
+								setOrder(postdata, function(result){
+									if(postdata.invoice_no!=null && postdata.invoice_no.length>0){
+										
+										postdata.shipping_status=result.order.shipping_status;
+										console.log($(".editButton"));
+										console.log($(".editButton").eq(i));
+										console.log(i);
+										$(".editButton").eq(i).css("visibility","hidden");
+										
+									}else{
+										alert('请输入发货单号！')
+									}
+									$('#grid-table').jqGrid('setRowData', id, postdata);
+								}); 
+								$( this ).dialog( "close" ); 
+							} 
+						}
+					]
+				});
+				window.editingRowData = {id:id, orderId:orderId};
+			}
+			
+			function tableData(p, ts, page, rows, result, postdata){
+				for(var i = 0; i < result.orders.length; i++) {
+					var obj = result.orders[i];
+					if(obj.ship_address){
+						if(obj.ship_address.country && obj.ship_address.province && obj.ship_address.district && obj.ship_address.address) {
+							obj.addRess = obj.ship_address.country + obj.ship_address.province + obj.ship_address.district + obj.ship_address.address;
+						}
+					}
+				}
+				var recordsCount = result.totalcount; //总计数
+				var totalpage = Math.ceil(recordsCount / rows);
+				var jsondata = {
+					total: totalpage,
+					page: page,
+					records: recordsCount,
+					rows: result.orders
+				};
+				ts.addJSONData(jsondata);
+				if($.isFunction(p.loadComplete)) {
+					p.loadComplete.call();
+				}
+			}
+			
+			$("#saixuan").click(function() {
+				var phone = $("#phoneNumber").val();
+				var orderId = $("#orderId").val();
+				var shippingStatus = $("#shippingStatus").val();
+				var payStatus = $("#payStatus").val();
+				var orderStatus = $("#orderStatus").val();
+				var startTime = $("#datebut").val();
+				var endTime = $("#datebut2").val();
+				var payId=$("#payId").val();
+				var areaname=$('#areaname').val();
+				var source=$('#source').val();
+				$("#grid-table").jqGrid("setGridParam", {page:1, postData: { "phone": phone, "orderid": orderId, "shipping_status": shippingStatus ,"pay_status":payStatus, "order_status":orderStatus,"createtime_from": startTime, "createtime_to": endTime,"payid":payId,"areaname":areaname,"export_to_excel": 0,"source":source} }).trigger('reloadGrid');
+			});
+
+			$('.download1').click(function() {
+                $("#grid-table").jqGrid("setGridParam", {page:1, postData: { "export_to_excel": 1 } }).trigger('reloadGrid');
+			});
+
+			jQuery(function($) {
+				var grid_selector = "#grid-table";
+				var pager_selector = "#grid-pager";
+
+				jQuery(grid_selector).jqGrid({
+
+					datatype: function(postdata) {
+						var ts = this,
+							p = this.p;
+						var page = postdata.page;
+						var rows = postdata.rows;
+
+						httpGetOrders(page, rows, postdata, function(result) {
+							if(result.errorCode) {
+								alert(result.errorMessage);
+							} else if(result.orders.length==0){
+								alert('用户不存在!');
+								tableData(p, ts, page, rows, result, postdata);
+							}else {
+								tableData(p, ts, page, rows, result, postdata);	
+							}
+						});
+					},
+					height: 'auto',
+					maxheight: 500,
+					cellsubmit : "clientArray",
+					colModel: [
+						{ label: '发货单号', name: 'invoice_no', index: 'invoice_no', width: 60, hidden:true,editable: true,editrules: { edithidden: true }},
+						{ label: '订单号', name: 'orderid', index: 'orderid', width: 60},
+						{ label: '用户信息', name: 'userinfo', index: 'userinfo', width: 120, editable: false },
+						{ label: '商品名称', name: 'prd_name', index: 'prd_name', width: 120, editable: false },
+						{ label: '商品类型', name: 'prd_type', index: 'prd_type', width: 100, editable: false },
+						{ label: '通话时长', name: 'call_duration', index: 'call_duration', width: 80, editable: false ,editable: false},
+						{ label: '专属号码', name: 'exclusive_number', index: 'exclusive_number', width: 100, editable: false },
+						{ label: '国家地区', name: 'areaname', index: 'areaname', width: 70, editable: false },
+						{ label: '商品总价', name: 'usit_price', index: 'usit_price', width: 70 },
+						{ label: '订单状态', name: 'order_status', index: 'order_status', formatter: orderStatusFormatter,editable: false, width: 70,edittype:"select",editoptions:{value:"0:未确认;1:已确认;2:已取消;3:退货中;4:退款中;5:关闭"}},
+						{ label: '支付状态', name: 'pay_status', index: 'pay_status',formatter:payStatusFormatter ,width: 70},
+						{ label: '发货状态', name: 'shipping_status', index: 'shipping_status',formatter:shippingStatusFormatter,width: 70, editable: false,edittype:"select",editoptions:{value:"0:未发货;1:已发货;2:已收货;3:备货中"}},
+						{ label:"支付方式", name:'payment', index:'payment',width: 100},
+						{ label: '订单来源', name: 'source', index: 'source', width: 100 },
+						{ label:"支付凭据编号", name:'pay_voucher', index:'pay_voucher',width: 110},
+						{ label:"订单生成时间", name:'createtime', index:'createtime',width: 120},
+//						{ label: '收货国家', name: 'country', index: 'country', width: 70, editable: false,hidden:true,editrules:{edithidden:true},formatter:countryFormatter},
+						{ label: '收货省份', name: 'province', index: 'province', width: 70, editable: false,hidden:true,editrules:{edithidden:true},formatter:provinceFormatter},
+						{ label: '收货市区', name: 'district', index: 'district', width: 70, editable: false,hidden:true,editrules:{edithidden:true},formatter:districtFormatter},
+						{ label: '收货地址', name: 'addRess', ndex: 'addRess', width: 200, sortable: false, editable: false, edittype: "textarea", editoptions: { rows: "4", cols: "30" }},
+						{ label: '收货人', name: 'consignee', index: 'consignee', width: 100,formatter:consigneeFormatter},
+						{ label: '收货人联系方式', name: 'mobile', index: 'mobile', width: 120 ,formatter:mobileFormatter},
+						{ label: '收货人邮编', name: 'zipcode', index: 'zipcode', width: 100 ,formatter:zipcodeFormatter},
+						{ label: '流量启用时间', name:'effect_datetime', index:'effect_datetime',width:90},
+						{ label: '流量停用时间', name:'failure_datetime',index:'failure_datetime',width:90},
+						{ label: '修改', name: 'act', index: 'act', width: 60, sortable: false }
+					],
+                    shrinkToFit: false,
+                    viewrecords: true,
+					rowNum: 20,
+					rowList: [20, 50, 100],
+					pager: pager_selector,
+					altRows: true,
+					gridComplete: function() {
+						var grid_selector = "#grid-table";
+						var idArray = jQuery(grid_selector).jqGrid('getDataIDs');
+						var contentArray = jQuery(grid_selector).jqGrid('getRowData');
+						for(var i = 0; i < idArray.length; i++) {
+							var id = idArray[i];
+							var orderId = contentArray[i].orderid;
+							if(contentArray[i].shipping_status!=="已收货" && contentArray[i].shipping_status!=="已发货" && contentArray[i].shipping_status!=="1" && contentArray[i].shipping_status!=="2"){
+								edit = "<input class='editButton' style=' height:22px; width:50px; margin:0 auto; display:block;' type='button' value='发货' onclick=\"editRowData("+id+","+orderId+","+i+");\" />";
+								jQuery(grid_selector).jqGrid('setRowData', id, {
+									act: edit
+								});
+							}
+							if(contentArray[i].shipping_status!=="未发货" && contentArray[i].shipping_status!=="备货中" && contentArray[i].shipping_status!=="0" && contentArray[i].shipping_status!=="3"){
+								edit = "<input class='editButton' style=' height:22px; width:50px; margin:0 auto; display:block; visibility:hidden' type='button' value='发货' onclick=\"editRowData("+id+","+orderId+","+i+");\" />";
+								jQuery(grid_selector).jqGrid('setRowData', id, {
+									act: edit
+								});
+							}
+						}
+					},
+
+					loadComplete: function() {
+
+						var table = this;
+						setTimeout(function() {
+							styleCheckbox(table);
+
+							updateActionIcons(table);
+							updatePagerIcons(table);
+							enableTooltips(table);
+						}, 0);
+					},
+
+					autowidth: true
+				});				
+
+//				function countryFormatter(cellvalue, options, rowObject) {
+//					if(rowObject.ship_address){
+//						return rowObject.ship_address.country;
+//					}
+//				}
+				function consigneeFormatter(cellvalue, options, rowObject) {
+					if(rowObject.ship_address){
+						if(rowObject.ship_address.consignee){
+							return rowObject.ship_address.consignee;
+						}else{
+						return "";
+						}
+					}else{
+						return "";
+					}
+				}
+				
+				function mobileFormatter(cellvalue, options, rowObject) {
+					if(rowObject.ship_address){
+						if(rowObject.ship_address.mobile){
+							return rowObject.ship_address.mobile;
+						}else{
+						return "";
+						}
+					}else{
+						return "";
+					}
+				}
+				
+				function zipcodeFormatter(cellvalue, options, rowObject) {
+					if(rowObject.ship_address){
+						if(rowObject.ship_address.zipcode){
+							return rowObject.ship_address.zipcode;
+						}else{
+						return "";
+						}
+					}else{
+						return "";
+					}
+				}
+				
+				function provinceFormatter(cellvalue, options, rowObject) {
+					if(rowObject.ship_address){
+						return rowObject.ship_address.province;
+					}
+				}
+				
+				function districtFormatter(cellvalue, options, rowObject) {
+					if(rowObject.ship_address){
+						return rowObject.ship_address.district;
+					}
+				}
+				
+				function orderStatusFormatter(cellvalue, options, rowObject) {
+					if(cellvalue == 0) {
+						order_status = "未确认";
+					}else if(cellvalue == 1) {
+						order_status = "已确认";
+					}else if(cellvalue == 2) {
+						order_status = "已取消";
+					}else if(cellvalue == 3) {
+						order_status = "已退款";
+					}else if(cellvalue == 4) {
+						order_status = "退款中";
+					}else if(cellvalue == 5) {
+						order_status = "关闭";
+					}else{
+						order_status = "已取消";
+					}
+					return order_status;
+				}
+				
+				function payStatusFormatter(cellvalue, options, rowObject){
+					if(cellvalue == 0 || cellvalue == 1) {
+						// 1表示的是付款中状态，这里APP端直接当成未付款状态处理
+						pay_status = "未支付";
+					}else if(cellvalue == 2) {
+						pay_status = "已付款";
+					}else if(cellvalue == 3) {
+						pay_status = "已退款";
+					}
+					else{
+						pay_status = "已取消";
+					}
+					return pay_status;
+				}
+				
+				function shippingStatusFormatter(cellvalue, options, rowObject){
+					if(cellvalue == 0) {
+						shipping_status = "未发货";
+					}else if(cellvalue == 1) {
+						shipping_status = "已发货";
+					}else if(cellvalue == 2) {
+						shipping_status = "已收货";
+					}else if(cellvalue == 3) {
+						shipping_status = "备货中";
+					}else{
+						shipping_status = "已取消";
+					}
+					return shipping_status;
+				}
+				//<%--导出Excel--%>
+				function exportExcel() { 
+            ExportJQGridDataToExcel('#grid-table', 'c.xlsx');
+        }
+
+				function aceSwitch(cellvalue, options, cell) {
+					setTimeout(function() {
+						$(cell).find('input[type=checkbox]')
+							.wrap('<label class="inline" />')
+							.addClass('ace ace-switch ace-switch-5')
+							.after('<span class="lbl"></span>');
+					}, 0);
+				} //yes/no
+				//enable datepicker
+				function pickDate(cellvalue, options, cell) {
+					setTimeout(function() {
+						$(cell).find('input[type=text]')
+							.datepicker({ format: 'yyyy-mm-dd', autoclose: true });
+					}, 0);
+				} //日期选择
+
+				//navButtons
+				jQuery(grid_selector).jqGrid('navGrid', pager_selector, { //navbar options
+					edit: false,
+					editicon: 'icon-pencil blue',
+					add: false,
+					addicon: 'icon-plus-sign purple',
+					del: false,
+					delicon: 'icon-trash red',
+					search: false,
+					searchicon: 'icon-search orange',
+					refresh: true,
+					refreshicon: 'icon-refresh green',
+					view: false,
+					viewicon: 'icon-zoom-in grey',
+				}, {
+					width:800,
+					left:500,
+					recreateForm: true,
+					beforeShowForm: function(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_edit_form(form);
+					}
+				}, {
+					//new record form
+					closeAfterAdd: true,
+					recreateForm: true,
+					viewPagerButtons: false,
+					beforeShowForm: function(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_edit_form(form);
+					}
+				}, {
+					//delete record form
+					recreateForm: true,
+					beforeShowForm: function(e) {
+						var form = $(e[0]);
+						if(form.data('styled')) return false;
+
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_delete_form(form);
+
+						form.data('styled', true);
+					},
+					onClick: function(e) {
+						alert(1);
+					}
+				}, {
+					//search form
+					recreateForm: true,
+					afterShowSearch: function(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+						style_search_form(form);
+					},
+					afterRedraw: function() {
+						style_search_filters($(this));
+					},
+					multipleSearch: true,
+					/**
+					 multipleGroup:true,
+					 showQuery: true
+					 */
+				}, {
+					//view record form
+					recreateForm: true,
+					beforeShowForm: function(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+					}
+				})
+
+				function style_edit_form(form) {
+					//enable datepicker on "sdate" field and switches for "stock" field
+					form.find('input[name=sdate]').datepicker({ format: 'yyyy-mm-dd', autoclose: true })
+						.end().find('input[name=stock]')
+						.addClass('ace ace-switch ace-switch-5').wrap('<label class="inline" />').after('<span class="lbl"></span>');
+
+					//update buttons classes
+					var buttons = form.next().find('.EditButton .fm-button');
+					buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove(); //ui-icon, s-icon
+					buttons.eq(0).addClass('btn-primary').prepend('<i class="icon-ok"></i>');
+					buttons.eq(1).prepend('<i class="icon-remove"></i>')
+
+					buttons = form.next().find('.navButton a');
+					buttons.find('.ui-icon').remove();
+					buttons.eq(0).append('<i class="icon-chevron-left"></i>');
+					buttons.eq(1).append('<i class="icon-chevron-right"></i>');
+				}
+
+				function style_delete_form(form) {
+					var buttons = form.next().find('.EditButton .fm-button');
+					buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove(); //ui-icon, s-icon
+					buttons.eq(0).addClass('btn-danger').prepend('<i class="icon-trash"></i>');
+					buttons.eq(1).prepend('<i class="icon-remove"></i>')
+				}
+
+				function style_search_filters(form) {
+					form.find('.delete-rule').val('X');
+					form.find('.add-rule').addClass('btn btn-xs btn-primary');
+					form.find('.add-group').addClass('btn btn-xs btn-success');
+					form.find('.delete-group').addClass('btn btn-xs btn-danger');
+				}
+
+				function style_search_form(form) {
+					var dialog = form.closest('.ui-jqdialog');
+					var buttons = dialog.find('.EditTable')
+					buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
+					buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
+					buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
+				}
+
+				function beforeDeleteCallback(e) {
+					var form = $(e[0]);
+					if(form.data('styled')) return false;
+
+					form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+					style_delete_form(form);
+
+					form.data('styled', true);
+				}
+
+				function beforeEditCallback(e) {
+					var form = $(e[0]);
+					form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+					style_edit_form(form);
+				}
+
+				//it causes some flicker when reloading or navigating grid
+				//it may be possible to have some custom formatter to do this as the grid is being created to prevent this
+				//or go back to default browser checkbox styles for the grid
+				function styleCheckbox(table) {
+					/**
+					 $(table).find('input:checkbox').addClass('ace')
+					 .wrap('<label />')
+					 .after('<span class="lbl align-top" />')
+
+
+					 $('.ui-jqgrid-labels th[id*="_cb"]:first-child')
+					 .find('input.cbox[type=checkbox]').addClass('ace')
+					 .wrap('<label />').after('<span class="lbl align-top" />');
+					 */
+				}
+
+				//unlike navButtons icons, action icons in rows seem to be hard-coded
+				//you can change them like this in here if you want
+				function updateActionIcons(table) {
+					/**
+             var replacement =
+             {
+                 'ui-icon-pencil' : 'icon-pencil blue',
+                 'ui-icon-trash' : 'icon-trash red',
+                 'ui-icon-disk' : 'icon-ok green',
+                 'ui-icon-cancel' : 'icon-remove red'
+             };
+             $(table).find('.ui-pg-div span.ui-icon').each(function(){
+						var icon = $(this);
+						var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+						if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+					})
+             */
+				}
+
+				//replace icons with FontAwesome icons like above
+				function updatePagerIcons(table) {
+					var replacement = {
+						'ui-icon-seek-first': 'icon-double-angle-left bigger-140',
+						'ui-icon-seek-prev': 'icon-angle-left bigger-140',
+						'ui-icon-seek-next': 'icon-angle-right bigger-140',
+						'ui-icon-seek-end': 'icon-double-angle-right bigger-140'
+					};
+					$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function() {
+						var icon = $(this);
+						var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+
+						if($class in replacement) icon.attr('class', 'ui-icon ' + replacement[$class]);
+					})
+				}
+
+				function enableTooltips(table) {
+					$('.navtable .ui-pg-button').tooltip({ container: 'body' });
+					$(table).find('.ui-pg-div').tooltip({ container: 'body' });
+				}
+
+			});
+		</script>
+	</body>
+
+</html>
